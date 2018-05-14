@@ -1,0 +1,2 @@
+python-telegram-bot==10.1.0
+transmissionrpc==0.11

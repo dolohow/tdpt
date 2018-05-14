@@ -1,0 +1,10 @@
+[General]
+call_on_finish =
+
+[Transmission]
+host = 127.0.0.1
+port = 9091
+
+[Telegram]
+bot_token =
+chat_id =

@@ -1,10 +1,17 @@
 [General]
-call_on_finish =
+# When transmission is done with downloading it will execute command or
+# script specified in this parameter.
+#call_on_finish =
 
 [Transmission]
 host = 127.0.0.1
 port = 9091
 
 [Telegram]
+# You can obtain it by asking several question to @BotFather and
+# creating your own bot
 bot_token =
+
+# Every user or group has this parameter.  If you don't know it ask
+# @get_id_bot for it.
 chat_id =

@@ -30,16 +30,6 @@ cp tdpt.ini.template tdpt.ini
 Edit it and save.
 
 
-## Options
-Parameters:
-```
-[General]
-call_on_finish - when transmission is done with downloading this script
-                 will execute command or script specified in this
-                 parameter
-```
-
-
 ## FAQ
 
 ### `Transmission` already supports running script upon finishing download

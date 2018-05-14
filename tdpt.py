@@ -134,7 +134,7 @@ def main():
                                        time_counter,
                                        torrents_tracked)).start()
 
-        time.sleep(10)
+        time.sleep(20)
 
 
 if __name__ == '__main__':

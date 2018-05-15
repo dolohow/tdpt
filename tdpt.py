@@ -9,8 +9,6 @@ import transmissionrpc
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
 
-TRANSMISSION = transmissionrpc.Client(CONFIG['Transmission']['host'],
-                                      port=CONFIG['Transmission']['port'])
 BOT = telegram.Bot(CONFIG['Telegram']['bot_token'])
 
 
@@ -50,7 +48,7 @@ Peers:    {}
             print("Timeout")
 
     def update(self):
-        self.torrent = TRANSMISSION.get_torrent(self.torrent.id)
+        self.torrent.update()
         try:
             self.bot.editMessageText(self._get_new_text(),
                                      chat_id=self.chat_id,
@@ -122,10 +120,12 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
 
 
 def main():
+    transmission = transmissionrpc.Client(CONFIG['Transmission']['host'],
+                                          port=CONFIG['Transmission']['port'])
     torrents_tracked = set()
     time_counter = TimeCounter()
     while True:
-        for torrent in TRANSMISSION.get_torrents():
+        for torrent in transmission.get_torrents():
             if (torrent.id not in torrents_tracked and
                     torrent.status == 'downloading'):
                 torrents_tracked.add(torrent.id)

@@ -4,7 +4,8 @@ import subprocess
 import configparser
 
 import telegram
-import transmissionrpc
+
+from backends import transmission
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
@@ -64,10 +65,10 @@ Peers:    {}
                                message_id=self.message_id)
 
     def _get_new_text(self):
-        return self.text.format(self.torrent.name, self.torrent.percentDone,
-                                format_speed(self.torrent.rateDownload),
-                                self.torrent.format_eta(),
-                                self.torrent.peersConnected)
+        return self.text.format(self.torrent.name, self.torrent.percent_done,
+                                format_speed(self.torrent.download_rate),
+                                self.torrent.eta,
+                                self.torrent.peers_connected)
 
 
 class TimeCounter:
@@ -108,7 +109,7 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
         except KeyError:
             cleanup('Torrent removed')
             return
-        if message.torrent.percentDone == 1.0:
+        if message.torrent.percent_done == 1.0:
             cleanup('Removing torrent from tracked')
             if not CONFIG.get('General', 'call_on_finish', fallback=None):
                 return
@@ -120,12 +121,12 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
 
 
 def main():
-    transmission = transmissionrpc.Client(CONFIG['Transmission']['host'],
-                                          port=CONFIG['Transmission']['port'])
+    backend = transmission.Client(CONFIG['Transmission']['host'],
+                                  CONFIG['Transmission']['port'])
     torrents_tracked = set()
     time_counter = TimeCounter()
     while True:
-        for torrent in transmission.get_torrents():
+        for torrent in backend.get_torrents():
             if (torrent.id not in torrents_tracked and
                     torrent.status == 'downloading'):
                 torrents_tracked.add(torrent.id)

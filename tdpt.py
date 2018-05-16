@@ -1,11 +1,10 @@
 import time
+import importlib
 import threading
 import subprocess
 import configparser
 
 import telegram
-
-from backends import transmission
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
@@ -121,12 +120,16 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
 
 
 def main():
-    backend = transmission.Client(CONFIG['Transmission']['host'],
-                                  CONFIG['Transmission']['port'])
+    backend_name = CONFIG.get('General', 'backend')
+
+    backend = importlib.import_module('backends.' + backend_name.lower())
+    client = backend.Client(CONFIG.get(backend_name, 'host'),
+                            CONFIG.get(backend_name, 'port'))
+
     torrents_tracked = set()
     time_counter = TimeCounter()
     while True:
-        for torrent in backend.get_torrents():
+        for torrent in client.get_torrents():
             if (torrent.id not in torrents_tracked and
                     torrent.status == 'downloading'):
                 torrents_tracked.add(torrent.id)

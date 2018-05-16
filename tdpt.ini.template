@@ -1,4 +1,6 @@
 [General]
+# Specifies from which torrent client data should be fetched.
+backend = Transmission
 # When transmission is done with downloading it will execute command or
 # script specified in this parameter.
 #call_on_finish =

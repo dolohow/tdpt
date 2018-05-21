@@ -2,7 +2,9 @@
 # Specifies from which torrent client data should be fetched.
 backend = Transmission
 # When transmission is done with downloading it will execute command or
-# script specified in this parameter.
+# script specified in this parameter.  With the following environment
+# variables:
+# TORRENT_NAME - name of the torrent that was downloaded
 #call_on_finish =
 
 [Transmission]

@@ -110,13 +110,16 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
             return
         if message.torrent.percent_done == 1.0:
             cleanup('Removing torrent from tracked')
-            if not CONFIG.get('General', 'call_on_finish', fallback=None):
+            call_on_finish = CONFIG.get('General', 'call_on_finish',
+                                        fallback=None)
+            if not call_on_finish:
                 return
-            subprocess.Popen('notification', env={
+            subprocess.Popen(call_on_finish, env={
                 'TORRENT_NAME': message.torrent.name,
                 'LC_ALL': 'en_GB.UTF-8',
                 'LANG': 'en_GB.UTF-8',
             })
+            return
 
 
 def main():

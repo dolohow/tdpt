@@ -19,6 +19,14 @@ def format_speed(speed):
     return '{:.1f} {}'.format(speed/1000/1000, 'MB/s')
 
 
+def escape_markdown_chars(msg):
+    ret = msg
+    replace_chars = ('*', '_', '[', '`')
+    for char in replace_chars:
+        ret = ret.replace(char, '\\' + char)
+    return ret
+
+
 class TorrentStatusMessage:
     text = (
 """{}
@@ -64,7 +72,8 @@ Peers:    {}
                                message_id=self.message_id)
 
     def _get_new_text(self):
-        return self.text.format(self.torrent.name, self.torrent.percent_done,
+        name = escape_markdown_chars(self.torrent.name)
+        return self.text.format(name, self.torrent.percent_done,
                                 format_speed(self.torrent.download_rate),
                                 self.torrent.eta,
                                 self.torrent.peers_connected)

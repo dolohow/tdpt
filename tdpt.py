@@ -51,6 +51,7 @@ Peers:    {}
             self.message_id = self.bot.sendMessage(
                 self.chat_id,
                 self._get_new_text(),
+                disable_notification=True,
                 parse_mode='markdown').message_id
         except telegram.error.TimedOut:
             print("Timeout")

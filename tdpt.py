@@ -1,6 +1,7 @@
 import time
 import importlib
 import threading
+import logging
 import subprocess
 import configparser
 
@@ -14,7 +15,6 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
 
 BOT = telegram.Bot(CONFIG['Telegram']['bot_token'])
-
 
 
 class TorrentStatusMessage:
@@ -37,14 +37,14 @@ Peers:    {}
 
     def create(self):
         try:
-            print('Creating new download message')
+            logging.info('Creating new download message')
             self.message_id = self.bot.sendMessage(
                 self.chat_id,
                 self._get_new_text(),
                 disable_notification=True,
                 parse_mode='markdown').message_id
         except telegram.error.TimedOut:
-            print("Timeout")
+            logging.warning("Timeout")
 
     def update(self):
         self.torrent.update()
@@ -56,7 +56,7 @@ Peers:    {}
         except telegram.error.BadRequest as bad_request:
             print(bad_request)
         except telegram.error.TimedOut:
-            print("Timeout")
+            logging.warning('Timeout')
 
     def delete(self):
         self.bot.deleteMessage(chat_id=self.chat_id,
@@ -92,8 +92,7 @@ class TimeCounter:
 
 def handle_torrent(torrent, time_counter, torrents_tracked):
 
-    def cleanup(text):
-        print(text)
+    def cleanup():
         message.delete()
         time_counter.prev()
         torrents_tracked.remove(torrent.id)
@@ -106,10 +105,12 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
         try:
             message.update()
         except KeyError:
-            cleanup('Torrent removed')
+            cleanup()
+            logging.info('Torrent removed')
             return
         if message.torrent.percent_done == 1.0:
-            cleanup('Removing torrent from tracked')
+            cleanup()
+            logging.info('Removing torrent from tracked')
             call_on_finish = CONFIG.get('General', 'call_on_finish',
                                         fallback=None)
             if not call_on_finish:
@@ -129,6 +130,9 @@ def main():
     client = backend.Client(CONFIG.get(backend_name, 'host'),
                             CONFIG.get(backend_name, 'port'))
 
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO)
     torrents_tracked = set()
     time_counter = TimeCounter()
     while True:

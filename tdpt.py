@@ -6,6 +6,8 @@ import configparser
 
 import telegram
 
+from telegram.utils.helpers import escape_markdown
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
 
@@ -17,14 +19,6 @@ def format_speed(speed):
     if speed < 1000000:
         return '{:.1f} {}'.format(speed/1000, 'kB/s')
     return '{:.1f} {}'.format(speed/1000/1000, 'MB/s')
-
-
-def escape_markdown_chars(msg):
-    ret = msg
-    replace_chars = ('*', '_', '[', '`')
-    for char in replace_chars:
-        ret = ret.replace(char, '\\' + char)
-    return ret
 
 
 class TorrentStatusMessage:
@@ -73,7 +67,7 @@ Peers:    {}
                                message_id=self.message_id)
 
     def _get_new_text(self):
-        name = escape_markdown_chars(self.torrent.name)
+        name = escape_markdown(self.torrent.name)
         return self.text.format(name, self.torrent.percent_done,
                                 format_speed(self.torrent.download_rate),
                                 self.torrent.eta,

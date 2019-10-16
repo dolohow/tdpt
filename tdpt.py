@@ -8,17 +8,13 @@ import telegram
 
 from telegram.utils.helpers import escape_markdown
 
+from helpers import format_speed
+
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')
 
 BOT = telegram.Bot(CONFIG['Telegram']['bot_token'])
 
-
-def format_speed(speed):
-    speed = float(speed)
-    if speed < 1000000:
-        return '{:.1f} {}'.format(speed/1000, 'kB/s')
-    return '{:.1f} {}'.format(speed/1000/1000, 'MB/s')
 
 
 class TorrentStatusMessage:

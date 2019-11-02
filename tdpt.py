@@ -1,9 +1,9 @@
-import time
+import configparser
 import importlib
-import threading
 import logging
 import subprocess
-import configparser
+import threading
+import time
 
 import telegram
 

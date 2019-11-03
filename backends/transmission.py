@@ -13,6 +13,9 @@ class Client:
         """
         self.transmission = transmissionrpc.Client(host, port)
 
+    def add_torrent(self, torrent, timeout=None, **kwargs):
+        return Torrent(self.transmission.add_torrent(torrent, timeout, **kwargs))
+
     def get_torrents(self):
         """Yields Torrents objects."""
         yield from map(lambda torrent: Torrent(torrent),

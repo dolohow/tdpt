@@ -12,6 +12,7 @@ Transmission downloading progress on Telegram
 * Self-adjustment of `Telegram` bot limits based on number of torrents
   tracked
 * Easy configuration
+* Uploading new torrent - just send torrent file to chat
 
 
 ## Installation

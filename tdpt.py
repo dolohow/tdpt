@@ -7,8 +7,10 @@ import time
 
 import telegram
 
+from telegram.ext import Updater
 from telegram.utils.helpers import escape_markdown
 
+from handlers.message_handlers import UploadNewTorrent
 from helpers import format_speed
 
 CONFIG = configparser.ConfigParser()
@@ -123,16 +125,24 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
             return
 
 
+def init_polling(client):
+    updater = Updater(token=CONFIG['Telegram']['bot_token'], use_context=True)
+    dispatcher = updater.dispatcher
+    dispatcher.add_handler(UploadNewTorrent(client))
+    updater.start_polling()
+
+
 def main():
+    logging.basicConfig(
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO)
     backend_name = CONFIG.get('General', 'backend')
 
     backend = importlib.import_module('backends.' + backend_name.lower())
     client = backend.Client(CONFIG.get(backend_name, 'host'),
                             CONFIG.get(backend_name, 'port'))
 
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=logging.INFO)
+    init_polling(client)
     torrents_tracked = set()
     time_counter = TimeCounter()
     while True:

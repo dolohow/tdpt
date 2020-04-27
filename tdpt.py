@@ -19,6 +19,10 @@ CONFIG.read('tdpt.ini')
 BOT = telegram.Bot(CONFIG['Telegram']['bot_token'])
 
 
+class MessageNotFound(telegram.error.BadRequest):
+    pass
+
+
 class TorrentStatusMessage:
     text = (
 """{}
@@ -56,9 +60,11 @@ Peers:    {}
                                      message_id=self.message_id,
                                      parse_mode='markdown')
         except telegram.error.BadRequest as bad_request:
-            print(bad_request)
+            if bad_request.message == 'Message to edit not found':
+                raise MessageNotFound(bad_request.message)
+            logging.warning(bad_request)
         except telegram.error.TimedOut:
-            logging.warning('Timeout')
+            logging.warning('Timeout when editing message')
 
     def delete(self):
         self.bot.deleteMessage(chat_id=self.chat_id,
@@ -109,6 +115,10 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
         except KeyError:
             cleanup()
             logging.info('Torrent removed')
+            return
+        except MessageNotFound as message_not_found:
+            logging.warning(message_not_found)
+            message.create()
             return
         if not message.torrent.is_downloading():
             cleanup()

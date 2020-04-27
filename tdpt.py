@@ -110,7 +110,7 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
             cleanup()
             logging.info('Torrent removed')
             return
-        if message.torrent.percent_done == 1.0:
+        if not message.torrent.is_downloading():
             cleanup()
             logging.info('Removing torrent from tracked')
             call_on_finish = CONFIG.get('General', 'call_on_finish',
@@ -148,7 +148,7 @@ def main():
     while True:
         for torrent in client.get_torrents():
             if (torrent.id not in torrents_tracked and
-                    torrent.status == 'downloading'):
+                    torrent.is_downloading()):
                 torrents_tracked.add(torrent.id)
                 threading.Thread(target=handle_torrent,
                                  args=(torrent,

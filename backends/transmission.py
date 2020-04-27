@@ -29,6 +29,10 @@ class Torrent:
         """Creates new `Torrent` object"""
         self.torrent = torrent
 
+    def is_downloading(self):
+        """bool: Is torrent currently downloading."""
+        return self.torrent.status == 'downloading'
+
     def update(self):
         """Updates the torrent information."""
         self.torrent.update()
@@ -65,8 +69,3 @@ class Torrent:
     def percent_done(self):
         """float: Download progress of selected files. 0.0 to 1.0."""
         return self.torrent.percentDone
-
-    @property
-    def status(self):
-        """str: Torrent current status."""
-        return self.torrent.status

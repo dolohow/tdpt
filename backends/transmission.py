@@ -4,14 +4,15 @@ import transmissionrpc
 class Client:
     """Handles connection to torrent client."""
 
-    def __init__(self, host, port):
+    def __init__(self, config):
         """Creates new torrent client connection.
 
         Args:
             host (str): Hostname or IP address where client is litening.
             port (int): Port where client is listening.
         """
-        self.transmission = transmissionrpc.Client(host, port)
+        self.transmission = transmissionrpc.Client(config['host'],
+                                                   config['port'])
 
     def add_torrent(self, torrent, timeout=None, **kwargs):
         return Torrent(self.transmission.add_torrent(torrent, timeout, **kwargs))

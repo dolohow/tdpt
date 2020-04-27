@@ -149,8 +149,7 @@ def main():
     backend_name = CONFIG.get('General', 'backend')
 
     backend = importlib.import_module('backends.' + backend_name.lower())
-    client = backend.Client(CONFIG.get(backend_name, 'host'),
-                            CONFIG.get(backend_name, 'port'))
+    client = backend.Client(CONFIG[backend_name])
 
     init_polling(client)
     torrents_tracked = set()

@@ -1,19 +1,29 @@
 [General]
 # Specifies from which torrent client data should be fetched.
-backend = Transmission
-# When transmission is done with downloading it will execute command or
-# script specified in this parameter.  With the following environment
+# Currently supported are
+# * Transmission
+# * rTorrent
+# You must further uncomment section for that client down below.
+#backend =
+# When torrent client is done with downloading it will execute command
+# or script specified in this parameter.  With the following environment
 # variables:
 # TORRENT_NAME - name of the torrent that was downloaded
 #call_on_finish =
 
-[Transmission]
-host = 127.0.0.1
-port = 9091
+#[Transmission]
+#host = 127.0.0.1
+#port = 9091
+
+#[rTorrent]
+#host = 127.0.0.1
+#port = 8080
+# Will set label to uploaded torrent visible in ruTorrent.
+#set_label = tacajushi-telegram
 
 [Telegram]
 # You can obtain it by asking several question to @BotFather and
-# creating your own bot
+# creating your own bot.
 bot_token =
 
 # Every user or group has this parameter.  If you don't know it ask

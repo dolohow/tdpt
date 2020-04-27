@@ -1,3 +1,5 @@
+import base64
+
 import transmissionrpc
 
 
@@ -15,7 +17,15 @@ class Client:
                                                    config['port'])
 
     def add_torrent(self, torrent, timeout=None, **kwargs):
-        return Torrent(self.transmission.add_torrent(torrent, timeout, **kwargs))
+        """Adds new torrent to download list.
+
+        Args:
+            torrent (telegram.File): File torrent object.
+            timeout (int): Drop connection after timeout seconds.
+        """
+        barray = torrent.download_as_bytearray()
+        filedump = base64.b64encode(barray).decode('utf-8')
+        self.transmission.add_torrent(filedump, timeout, **kwargs)
 
     def get_torrents(self):
         """Yields Torrents objects."""

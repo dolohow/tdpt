@@ -1,12 +1,13 @@
 TDPT
 ====
 
-Transmission downloading progress on Telegram
+Torrent downloading progress on Telegram
 
-![Screencast](https://i.imgur.com/IEOLsL6.gif "Screencast")
+![Screencast](https://i.imgur.com/YV6LYCl.gif "Screencast")
 
 
 ## Features
+* Support for two most popular torrent clients `Transmission` and `rTorrent`
 * Multithreading, each downloading item is handled separately
 * Running post download script in separate process
 * Self-adjustment of `Telegram` bot limits based on number of torrents
@@ -16,18 +17,16 @@ Transmission downloading progress on Telegram
 
 
 ## Installation
-You need Python 3 to run this program.  It can now on Python 2, but I
-did not make any effort to support that.
+You need Python 3 to run this program.
 
 ```
-pip install -r requirements.txt
+$ pip install --user tdpt
 ```
 
-Create configuration file file
+Create configuration file
 ```
-cp tdpt.ini.template tdpt.ini
+$ cp tdpt.ini.template tdpt.ini
 ```
-
 Edit it and save.
 
 

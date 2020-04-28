@@ -10,8 +10,8 @@ import telegram
 from telegram.ext import Updater
 from telegram.utils.helpers import escape_markdown
 
-from handlers.message_handlers import UploadNewTorrent
-from helpers import format_speed
+from tdpt.handlers.message_handlers import UploadNewTorrent
+from tdpt.helpers import format_speed
 
 CONFIG = configparser.ConfigParser()
 CONFIG.read('tdpt.ini')

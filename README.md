@@ -3,7 +3,7 @@ TDPT
 
 Torrent downloading progress on Telegram
 
-![Screencast](https://i.imgur.com/YV6LYCl.gif "Screencast")
+![Screencast](https://i.imgur.com/yTsldua.gif "Screencast")
 
 
 ## Features

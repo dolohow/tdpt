@@ -22,7 +22,7 @@ setuptools.setup(
     author_email="lukasz@zarnowiecki.pl",
     description="Torrent downloading progress on Telegram",
     entry_points={
-        'console_scripts': ['tdpt = tdpt:tdpt.main'],
+        'console_scripts': ['tdpt = tdpt:__main__.main'],
     },
     install_requires=get_requirements(),
     keywords="telegram bot transmission liveupdates torrents rtorrent torrent",

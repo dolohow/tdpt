@@ -7,8 +7,9 @@ import time
 
 import telegram
 
-from telegram.ext import Updater
+from telegram.ext import Updater, MessageQueue
 from telegram.utils.helpers import escape_markdown
+from telegram.utils.promise import Promise
 
 from tdpt.handlers.message_handlers import UploadNewTorrent
 from tdpt.helpers import format_speed
@@ -35,30 +36,42 @@ Peers:    {}
 ```"""
     )
 
-    def __init__(self, bot, chat_id, torrent):
+    def __init__(self, bot, chat_id, torrent, message_queue):
         self.bot = bot
         self.torrent = torrent
         self.chat_id = chat_id
         self.message_id = None
+        self.message_queue = message_queue
 
     def create(self):
+        logging.info('Creating new download message')
+        promise = Promise(self.bot.sendMessage,
+                          args=(
+                              self.chat_id,
+                              self._get_new_text(),
+                          ),
+                          kwargs={
+                              "disable_notification": True,
+                              "parse_mode": "markdown",
+                          })
+        self.message_queue(promise)
         try:
-            logging.info('Creating new download message')
-            self.message_id = self.bot.sendMessage(
-                self.chat_id,
-                self._get_new_text(),
-                disable_notification=True,
-                parse_mode='markdown').message_id
+            self.message_id = promise.result().message_id
         except telegram.error.TimedOut:
-            logging.warning("Timeout")
+            logging.warning("Timeout when creating a new download message")
 
     def update(self):
         self.torrent.update()
+        promise = Promise(self.bot.editMessageText,
+                          args=(self._get_new_text(), ),
+                          kwargs={
+                              "chat_id": self.chat_id,
+                              "message_id": self.message_id,
+                              "parse_mode": "markdown",
+                          })
+        self.message_queue(promise, is_group_msg=True)
         try:
-            self.bot.editMessageText(self._get_new_text(),
-                                     chat_id=self.chat_id,
-                                     message_id=self.message_id,
-                                     parse_mode='markdown')
+            promise.result()
         except telegram.error.BadRequest as bad_request:
             if bad_request.message == 'Message to edit not found':
                 raise MessageNotFound(bad_request.message)
@@ -67,49 +80,31 @@ Peers:    {}
             logging.warning('Timeout when editing message')
 
     def delete(self):
-        self.bot.deleteMessage(chat_id=self.chat_id,
-                               message_id=self.message_id)
+        promise = Promise(self.bot.deleteMessage,
+                          args=(),
+                          kwargs={
+                              "chat_id": self.chat_id,
+                              "message_id": self.message_id
+                          })
+        self.message_queue(promise, is_group_msg=True)
 
     def _get_new_text(self):
         name = escape_markdown(self.torrent.name)
         return self.text.format(name, self.torrent.percent_done,
                                 format_speed(self.torrent.download_rate),
-                                self.torrent.eta,
-                                self.torrent.peers_connected)
+                                self.torrent.eta, self.torrent.peers_connected)
 
 
-class TimeCounter:
-
-    messages_per_second = 3
-
-    def __init__(self):
-        self.counter = 0
-        self.lock = threading.Lock()
-
-    def next(self):
-        with self.lock:
-            self.counter += 1
-
-    def prev(self):
-        with self.lock:
-            self.counter -= 1
-
-    def get_time(self):
-        return self.messages_per_second*self.counter+1
-
-
-def handle_torrent(torrent, time_counter, torrents_tracked):
-
+def handle_torrent(torrent, message_queue, torrents_tracked):
     def cleanup():
         message.delete()
-        time_counter.prev()
         torrents_tracked.remove(torrent.id)
 
-    message = TorrentStatusMessage(BOT, CONFIG['Telegram']['chat_id'], torrent)
-    time_counter.next()
+    message = TorrentStatusMessage(BOT, CONFIG['Telegram']['chat_id'], torrent,
+                                   message_queue)
     message.create()
     while True:
-        time.sleep(time_counter.get_time())
+        time.sleep(3)
         try:
             message.update()
         except KeyError:
@@ -123,15 +118,17 @@ def handle_torrent(torrent, time_counter, torrents_tracked):
         if not message.torrent.is_downloading():
             cleanup()
             logging.info('Removing torrent from tracked')
-            call_on_finish = CONFIG.get('General', 'call_on_finish',
+            call_on_finish = CONFIG.get('General',
+                                        'call_on_finish',
                                         fallback=None)
             if not call_on_finish:
                 return
-            subprocess.Popen(call_on_finish, env={
-                'TORRENT_NAME': message.torrent.name,
-                'LC_ALL': 'en_GB.UTF-8',
-                'LANG': 'en_GB.UTF-8',
-            })
+            subprocess.Popen(call_on_finish,
+                             env={
+                                 'TORRENT_NAME': message.torrent.name,
+                                 'LC_ALL': 'en_GB.UTF-8',
+                                 'LANG': 'en_GB.UTF-8',
+                             })
             return
 
 
@@ -153,15 +150,15 @@ def main():
 
     init_polling(client)
     torrents_tracked = set()
-    time_counter = TimeCounter()
+    message_queue = MessageQueue()
+
     while True:
         for torrent in client.get_torrents():
-            if (torrent.id not in torrents_tracked and
-                    torrent.is_downloading()):
+            if (torrent.id not in torrents_tracked
+                    and torrent.is_downloading()):
                 torrents_tracked.add(torrent.id)
                 threading.Thread(target=handle_torrent,
-                                 args=(torrent,
-                                       time_counter,
+                                 args=(torrent, message_queue,
                                        torrents_tracked)).start()
 
         time.sleep(20)

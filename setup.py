@@ -17,7 +17,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="tdpt",
-    version="1.2",
+    version="1.3",
     author="dolohow",
     author_email="lukasz@zarnowiecki.pl",
     description="Torrent downloading progress on Telegram",

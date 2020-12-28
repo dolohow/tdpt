@@ -7,7 +7,7 @@ Torrent downloading progress on Telegram
 
 
 ## Features
-* Support for two most popular torrent clients `Transmission` and `rTorrent`
+* Support for two most popular torrent clients `Transmission`, `rTorrent` and `deluge`
 * Multithreading, each downloading item is handled separately
 * Running post download script in separate process
 * Self-adjustment of `Telegram` bot limits based on number of torrents

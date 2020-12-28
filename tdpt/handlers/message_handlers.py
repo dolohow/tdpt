@@ -13,9 +13,9 @@ class UploadNewTorrent(MessageHandler):
 
     def callback(self, update, context):
         torrent = update.message.document.get_file()
-        self.client.add_torrent(torrent)
-        logging.info('Added new torrent file %s',
-                     update.message.document.file_name)
+        file_name = update.message.document.file_name
+        self.client.add_torrent(file_name, torrent)
+        logging.info('Added new torrent file %s', file_name)
         context.bot.send_message(
             chat_id=update.effective_chat.id,
             text='Added *{}*'.format(update.message.document.file_name),

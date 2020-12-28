@@ -16,7 +16,7 @@ class Client:
         self.transmission = transmissionrpc.Client(config['host'],
                                                    config['port'])
 
-    def add_torrent(self, torrent, timeout=None, **kwargs):
+    def add_torrent(self, file_name, torrent, timeout=None, **kwargs):
         """Adds new torrent to download list.
 
         Args:

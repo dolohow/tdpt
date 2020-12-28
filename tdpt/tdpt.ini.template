@@ -21,6 +21,13 @@
 # Will set label to uploaded torrent visible in ruTorrent.
 #set_label = tacajushi-telegram
 
+#[deluge]
+#host = 127.0.0.1
+#port = 58846
+#username = localclient
+# You can find password in `auth` file in deluge config directory
+#password =
+
 [Telegram]
 # You can obtain it by asking several question to @BotFather and
 # creating your own bot.

@@ -10,7 +10,7 @@ class Client:
         self.config = config
         self.proxy = xmlrpc.client.ServerProxy(url, verbose=False)
 
-    def add_torrent(self, torrent, timeout=None, **kwargs):
+    def add_torrent(self, file_name, torrent, timeout=None, **kwargs):
         self.proxy.load.start_verbose(
             '',
             torrent.file_path,

@@ -18,7 +18,7 @@ class Client:
     def get_torrents(self):
         """Yields Torrents objects."""
         yield from map(lambda torrent: Torrent(torrent, self.client),
-                       self.client.core.get_torrents_status({}, ()))
+                       self.client.core.get_torrents_status({"state": "Downloading"}, ()))
 
 
 class Torrent:

@@ -1,15 +1,12 @@
 import configparser
 import importlib
 import logging
-import subprocess
-import threading
 import time
 
 import telegram
 
-from telegram.ext import Updater, MessageQueue
+from telegram.ext import Updater
 from telegram.utils.helpers import escape_markdown
-from telegram.utils.promise import Promise
 
 from handlers.message_handlers import UploadNewTorrent
 from helpers import format_speed

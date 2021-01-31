@@ -5,11 +5,6 @@
 # * rTorrent
 # You must further uncomment section for that client down below.
 #backend =
-# When torrent client is done with downloading it will execute command
-# or script specified in this parameter.  With the following environment
-# variables:
-# TORRENT_NAME - name of the torrent that was downloaded
-#call_on_finish =
 
 #[Transmission]
 #host = 127.0.0.1

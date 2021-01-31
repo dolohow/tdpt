@@ -4,7 +4,6 @@ import xmlrpc.client
 
 
 class Client:
-
     def __init__(self, config):
         url = f'http://{config["host"]}:{config["port"]}/RPC2'
         self.config = config
@@ -12,8 +11,7 @@ class Client:
 
     def add_torrent(self, file_name, torrent, timeout=None, **kwargs):
         self.proxy.load.start_verbose(
-            '',
-            torrent.file_path,
+            '', torrent.file_path,
             [f'd.custom1.set={self.config["set_label"]}'])
 
     def get_torrents(self):
@@ -47,15 +45,11 @@ class Torrent:
         self.update()
 
     def is_downloading(self):
-        return (self.__get_prop('down.rate') and
-                self.__get_prop('is_open') and
-                self.__get_prop('is_active'))
+        return (self.__get_prop('down.rate') and self.__get_prop('is_open')
+                and self.__get_prop('is_active'))
 
     def update(self):
-        try:
-            self.data = tuple(self.multicall())
-        except:
-            raise KeyError
+        self.data = tuple(self.multicall())
 
     @property
     def download_rate(self):
@@ -67,8 +61,7 @@ class Torrent:
             return 'Unavailable'
         chunks_left = (self.__get_prop('size_chunks') -
                        self.__get_prop('completed_chunks'))
-        down_rate = (chunks_left *
-                     self.__get_prop('chunk_size') /
+        down_rate = (chunks_left * self.__get_prop('chunk_size') /
                      self.__get_prop('down.rate'))
         return datetime.timedelta(seconds=math.floor(down_rate))
 
@@ -87,7 +80,7 @@ class Torrent:
     @property
     def percent_done(self):
         return (self.__get_prop('completed_bytes') /
-                               self.__get_prop('size_bytes'))
+                self.__get_prop('size_bytes'))
 
     def __get_prop(self, prop):
         return self.data[self.PROPERTIES[prop]]

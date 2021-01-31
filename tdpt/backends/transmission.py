@@ -1,11 +1,10 @@
 import base64
 
-import transmissionrpc
+import transmission_rpc
 
 
 class Client:
     """Handles connection to torrent client."""
-
     def __init__(self, config):
         """Creates new torrent client connection.
 
@@ -13,8 +12,8 @@ class Client:
             host (str): Hostname or IP address where client is litening.
             port (int): Port where client is listening.
         """
-        self.transmission = transmissionrpc.Client(config['host'],
-                                                   config['port'])
+        self.transmission = transmission_rpc.Client(config['host'],
+                                                    config['port'])
 
     def add_torrent(self, file_name, torrent, timeout=None, **kwargs):
         """Adds new torrent to download list.
@@ -35,12 +34,11 @@ class Client:
 
 class Torrent:
     """Represents torrent in torrent client."""
-
     def __init__(self, torrent):
         """Creates new `Torrent` object"""
         self.torrent = torrent
 
-    def is_downloading(self):
+    def is_downloading(self) -> bool:
         """bool: Is torrent currently downloading."""
         return self.torrent.status == 'downloading'
 
@@ -49,7 +47,7 @@ class Torrent:
         self.torrent.update()
 
     @property
-    def download_rate(self):
+    def download_rate(self) -> int:
         """int: Download rate in bps."""
         return self.torrent.rateDownload
 

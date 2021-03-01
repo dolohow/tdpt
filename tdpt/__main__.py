@@ -31,6 +31,7 @@ Peers:    {}
         self.bot = bot
         self.chat_id = chat_id
         self.message_id = None
+        self.message_content = None
 
     def create_or_update(self, torrents):
         if not self.message_id:
@@ -39,15 +40,18 @@ Peers:    {}
             self._update(torrents)
 
     def delete(self):
+        logging.info('Deleting message')
         self.bot.delete_message(chat_id=self.chat_id,
                                 message_id=self.message_id)
+        self.message_id = None
 
     def _create(self, torrents):
         logging.info('Creating new download message')
+        self.message_content = self._get_new_text(torrents)
         try:
             self.message_id = self.bot.send_message(
                 self.chat_id,
-                self._get_new_text(torrents),
+                self.message_content,
                 disable_notification=True,
                 parse_mode='markdown').message_id
         except telegram.error.TimedOut:
@@ -55,8 +59,13 @@ Peers:    {}
 
     def _update(self, torrents):
         logging.info('Updating download message')
+        new_message_content = self._get_new_text(torrents)
+        if new_message_content == self.message_content:
+            logging.info('Message the same, skipping update')
+            return
+        self.message_content = new_message_content
         try:
-            self.bot.edit_message_text(self._get_new_text(torrents),
+            self.bot.edit_message_text(self.message_content,
                                        chat_id=self.chat_id,
                                        message_id=self.message_id,
                                        parse_mode="markdown")
@@ -97,19 +106,24 @@ def main():
     init_polling(client)
     message = TorrentStatusMessage(BOT, CONFIG['Telegram']['chat_id'])
 
+    prev_torrents_count = 0
     while True:
-        prev_torrents_number = 0
         torrents = []
         for torrent in client.get_torrents():
             if torrent.is_downloading():
                 torrents.append(torrent)
 
-        if prev_torrents_number != len(torrents):
+        torrents_count = len(torrents)
+        if torrents_count > prev_torrents_count:
+            if message.message_id:
+                message.delete()
+        if torrents_count > 0:
             message.create_or_update(torrents)
-            prev_torrents_number = len(torrents)
         else:
-            message.delete()
+            if message.message_id:
+                message.delete()
 
+        prev_torrents_count = len(torrents)
         time.sleep(3)
 
 

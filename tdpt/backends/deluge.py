@@ -33,7 +33,7 @@ class Torrent:
         self.update(torrent_hash)
 
     def is_downloading(self) -> bool:
-        return self.torrent[b'state'] == b'Downloading'
+        return self.torrent[b'state'] == b'Downloading' and self.torrent[b'eta'] != 0
 
     def update(self, torrent_hash=None):
         h = torrent_hash if torrent_hash else self.torrent[b'hash']

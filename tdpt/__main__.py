@@ -1,6 +1,8 @@
+import argparse
 import configparser
 import importlib
 import logging
+import pathlib
 import time
 
 import telegram
@@ -11,8 +13,19 @@ from telegram.utils.helpers import escape_markdown
 from handlers.message_handlers import UploadNewTorrent
 from helpers import format_speed
 
+PARSER = argparse.ArgumentParser(
+    description='Torrent downloading progress on Telegram')
+PARSER.add_argument(
+    '--config',
+    action='store',
+    default='tdpt.ini.',
+    help='Path to configuration file',
+    metavar='PATH',
+    type=pathlib.Path,
+)
+ARGS = PARSER.parse_args()
 CONFIG = configparser.ConfigParser()
-CONFIG.read('tdpt.ini')
+CONFIG.read(ARGS.config)
 
 BOT = telegram.Bot(CONFIG['Telegram']['bot_token'])
 

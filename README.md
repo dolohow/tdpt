@@ -13,14 +13,16 @@ Torrent downloading progress on Telegram
 
 
 ## Installation
-You need Python 3 to run this program.
 
-```
-$ pip install --user tdpt
+### Docker
+Download config file and edit it for your needs
+```bash
+wget https://raw.githubusercontent.com/dolohow/tdpt/master/config/tdpt.ini
 ```
 
-Create configuration file
+```bash
+podman run -d \
+  --name tdpt \
+  -v PATH_TO_DIR_WITH_TDPT_INI:/config \
+  dolohow/tdpt
 ```
-$ cp tdpt.ini.template tdpt.ini
-```
-Edit it and save.
